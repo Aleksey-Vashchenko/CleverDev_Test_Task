@@ -3,16 +3,17 @@ package com.vashchenko.cleverdev_test_task.entity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 
 @Entity
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Setter
 @Getter
+@NoArgsConstructor
 public class Note {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

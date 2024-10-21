@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -31,8 +32,8 @@ public class ClientDataFetcher {
             return Arrays.asList(clients);
         }
         catch (RestClientException e){
-            log.error(e);
-            throw e;
+            log.error(e,e.fillInStackTrace());
+            return new ArrayList<ClientInfoResponseDto>();
         }
     }
 

@@ -6,6 +6,7 @@ import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.DefaultUriBuilderFactory;
 
 @Configuration
 @AllArgsConstructor
@@ -14,7 +15,7 @@ public class FetchersConfig {
 
     @Bean
     RestTemplate usersRestTemplate(@Value("${url.old}")String oldUrl){
-        return templateBuilder.rootUri(oldUrl).build();
+        return templateBuilder.uriTemplateHandler(new DefaultUriBuilderFactory(oldUrl)).build();
     }
 
 }
