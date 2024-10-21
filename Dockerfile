@@ -5,7 +5,7 @@ FROM openjdk:17-jdk-slim
 WORKDIR /app
 
 # Копируем файл jar вашего приложения в контейнер
-COPY target/your-app.jar app.jar
+COPY target/*.jar app.jar
 
 # Указываем команду для запуска приложения
 ENTRYPOINT ["java", "-jar", "app.jar"]

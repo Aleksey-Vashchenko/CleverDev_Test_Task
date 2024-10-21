@@ -9,10 +9,9 @@ services:
       POSTGRES_PASSWORD: test
       POSTGRES_DB: new_system_db
     volumes:
-      - postgres_data:/var/lib/postgresql/data
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./init.sql:/docker-entrypoint-initdb.d/db.sql
     ports:
-      - "5432:5432"
+      - "5433:5432"
 
   import_service:
     build:
@@ -23,20 +22,13 @@ services:
     depends_on:
       - postgres
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/new_system_db
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/new_system_db
       SPRING_DATASOURCE_USERNAME: test
       SPRING_DATASOURCE_PASSWORD: test
 
-  app2:
-    image: your_java_app2_image
-    container_name: java_app2
+  old:
     build:
-      context: ./app2
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/your_database
-      SPRING_DATASOURCE_USERNAME: your_username
-      SPRING_DATASOURCE_PASSWORD: your_password
-    depends_on:
-      - postgres
+      context: ./OldSystem
+      dockerfile: Dockerfile
     ports:
-      - "8082:8080"
+      - "8081:8081"
