@@ -10,6 +10,7 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Setter
 @Getter
+@Table(name = "patient_profile")
 public class Patient {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

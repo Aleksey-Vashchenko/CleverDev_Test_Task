@@ -35,7 +35,7 @@ public class ImportTask {
     @Async
     public void execute(ClientInfoResponseDto client ){
         long start = System.currentTimeMillis();
-        log.debug("Task %s start import");
+        log.debug("Task {} start import",client.guid());
         List<NoteInfoResponseDto> notes = notesFetcher.getNotesByClient(client.agency(),client.guid());
         importStatist.incrementAllNotesCounter(notes.size());
         Patient patient = patientService.findByOldGuid(client.guid());
@@ -45,13 +45,13 @@ public class ImportTask {
                     importNote(note,patient,client);
                 }
                 catch (Exception e){
-                    log.error(String.format("Exception saving note with guid %s "),note.guid(),e);
+                    log.error(String.format("Exception saving note with guid %s ",note.guid()),e);
                 }
 
             }
         }
         else {
-            log.info(String.format("Patient with guid %s was not found in New System"),client.guid());
+            log.info(String.format("Patient with guid %s was not found in New System",client.guid()));
             importStatist.incrementNotFoundClientsCounter();
             importStatist.incrementSkippedNotesCounter(notes.size());
         }
@@ -73,37 +73,37 @@ public class ImportTask {
     }
 
     private void processExistingNote(Note note,NoteInfoResponseDto noteDto){
-        log.debug(String.format("Note with guid '%s' was found in New System"),noteDto.guid());
+        log.debug(String.format("Note with guid '%s' was found in New System",noteDto.guid()));
         if(note.getLastModifiedAt().isBefore(noteDto.modifiedDateTime())){
             note.setNote(noteDto.noteBody());
-            log.debug(String.format("There is no way to determine the last person who edited '%s' document. The default value is null."),noteDto.guid());
+            log.debug(String.format("There is no way to determine the last person who edited '%s' document. The default value is null.",noteDto.guid()));
             note.setLastModifier(null);
             note.setLastModifiedAt(noteDto.modifiedDateTime());
             noteService.save(note);
-            log.info(String.format("Note with guid '%s' was successful updated in New System by Id '%s'"),noteDto.guid(),note.getId());
+            log.info(String.format("Note with guid '%s' was successful updated in New System by Id '%s'",noteDto.guid(),note.getId()));
             importStatist.incrementSavedNotesCounter();
         }
         else {
-            log.debug(String.format("Note with guid '%s' a later modification date as note with id '%s"),noteDto.guid(),note.getId());
+            log.debug(String.format("Note with guid '%s' a later modification date as note with id '%s",noteDto.guid(),note.getId()));
             importStatist.incrementSkippedNotesCounter();
         }
     }
 
     private void processNotExistingNote(NoteInfoResponseDto noteDto, User user,
                                         Patient patient){
-        log.debug(String.format("Note with guid '%s' was not found in New System"),noteDto.guid());
+        log.debug(String.format("Note with guid '%s' was not found in New System",noteDto.guid()));
         Note noteToSave = noteMapper.toEntity(noteDto);
         noteToSave.setCreator(user);
         noteToSave.setPatient(patient);
         if(noteToSave.getCreatedAt().isBefore(noteToSave.getLastModifiedAt())){
-            log.debug(String.format("There is no way to determine the last person who edited '%s' document. The default value is null."),noteToSave.getId());
+            log.debug(String.format("There is no way to determine the last person who edited '%s' document. The default value is null.",noteToSave.getId()));
             noteToSave.setLastModifier(null);
         }
         else {
             noteToSave.setLastModifier(user);
         }
         noteService.save(noteToSave);
-        log.info(String.format("Note with guid '%s' was successful saved to New System by Id '%s'"),noteDto.guid(),noteToSave.getId());
+        log.info(String.format("Note with guid '%s' was successful saved to New System by Id '%s'",noteDto.guid(),noteToSave.getId()));
         importStatist.incrementSavedNotesCounter();
     }
 
@@ -117,7 +117,7 @@ public class ImportTask {
             User newUser = new User();
             newUser.setLogin(login);
             user = userService.save(newUser);
-            log.info(String.format("Was created user with login '%s' and id '%s'"),login,user.getId());
+            log.info(String.format("Was created user with login '%s' and id '%s'",login,user.getId()));
             importStatist.incrementCreatedUsersCounter();
         }
         return user;

@@ -35,7 +35,7 @@ public class NotesDataFetcher {
             ClientInfoRequestDto requestDto = new ClientInfoRequestDto(agency,dateFrom,dateTo,guid);
             NoteInfoResponseDto[] notes = restTemplate.postForObject(notesUrl,requestDto,NoteInfoResponseDto[].class);
             if(notes==null) notes=new NoteInfoResponseDto[0];
-            log.debug(String.format("%s clients were fetched from Old System for client %s"),notes.length,guid);
+            log.debug(String.format("%s clients were fetched from Old System for client %s",notes.length,guid));
             return Arrays.asList(notes);
         }
         catch (RestClientException e){

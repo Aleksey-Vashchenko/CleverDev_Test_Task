@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 @Setter
 @Getter
 @NoArgsConstructor
+@Table(name = "patient_note")
 public class Note {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,13 +25,13 @@ public class Note {
     LocalDateTime lastModifiedAt;
 
     @OneToOne
-            @JoinColumn(name = "id")
+    @JoinColumn(name = "created_by_user_id")
     User creator;
     @OneToOne
-    @JoinColumn(name = "id")
+    @JoinColumn(name = "last_modified_by_user_id")
     User lastModifier;
     String note;
     @OneToOne
-    @JoinColumn(name = "id")
+    @JoinColumn(name = "patient_id")
     Patient patient;
 }
