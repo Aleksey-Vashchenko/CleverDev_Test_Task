@@ -30,9 +30,9 @@ public class DataGeneratorTask {
         this.notesRepository = notesRepository;
     }
 
-    @Scheduled
+    @Scheduled(fixedDelay = 5000)
     public void generateData() {
-        logger.debug("Start generate task");
+        logger.info("Start generate task");
         int randomNumber = random.nextInt(3);
         switch (randomNumber){
             case 0:{createNewClient();}
@@ -42,8 +42,15 @@ public class DataGeneratorTask {
     }
 
     private void updateExistedNote() {
-        logger.debug("updateExistedNote task started");
-        Client client = getRandomClient();
+        logger.info("updateExistedNote task started");
+        Client client;
+        try {
+            client = getRandomClient();
+
+        }
+        catch (IllegalArgumentException e){
+            return;
+        }
         List<Note> matchingNotes = notesRepository.getAllNotes().stream()
                 .filter(note -> note.getGuid().equals(client.getGuid()))
                 .toList();
@@ -52,15 +59,15 @@ public class DataGeneratorTask {
             Note randomNote = matchingNotes.get(random.nextInt(matchingNotes.size()));
             randomNote.setComments("Updated Comment");
             randomNote.setModifiedAt(LocalDateTime.now());
-            logger.debug("Updated 1 note for client {}",client);
+            logger.info("Updated 1 note for client {}",client.getGuid());
         }
         else {
-            logger.debug("Not found notes for client {}",client);
+            logger.info("Not found notes for client {}",client.getGuid());
         }
     }
 
     private void createNewClient(){
-        logger.debug("createNewClient task started");
+        logger.info("createNewClient task started");
         Client client = Instancio.of(Client.class)
                 .set(Select.field(Client::getAgency), "Agency " + (int) (Math.random() * 6))
                 .set(Select.field(Client::getStatus), "ACTIVE") // Фиксированный статус
@@ -68,28 +75,40 @@ public class DataGeneratorTask {
                 .generate(Select.field(Client::getCreatedAt), gen -> gen.temporal().localDateTime().range(LocalDateTime.now().minusYears(21),LocalDateTime.now()))
                 .create();
         clientRepository.add(client);
-        logger.debug("client {} was added",client);
+        logger.info("client {} was added",client.getGuid());
     }
 
     private void createNewNote(){
-        logger.debug("createNewNote task started");
-        Client client = getRandomClient();
+        logger.info("createNewNote task started");
+        Client client = null;
+        try {
+            client = getRandomClient();
+
+        }
+        catch (IllegalArgumentException e){
+            return;
+        }
         Note note = Instancio.of(Note.class)
                 .generate(Select.field(Note::getComments),gen -> gen.text().loremIpsum() )
-                .generate(Select.field(Note::getModifiedAt), gen -> gen.temporal().localDate().range(LocalDate.now().minusYears(19),LocalDate.now()))
+                .generate(Select.field(Note::getModifiedAt), gen -> gen.temporal().localDateTime().range(LocalDateTime.now().minusYears(19),LocalDateTime.now()))
                 .set(Select.field(Note::getClientGuid), UUID.randomUUID())
-                .generate(Select.field(Note::getDatetime), gen -> gen.temporal().localDate().past())
+                .generate(Select.field(Note::getDatetime), gen -> gen.temporal().localDateTime().past())
                 .set(Select.field(Note::getLoggedUser), "User" + (int) (Math.random() * 100))
-                .generate(Select.field(Note::getCreatedAt), gen -> gen.temporal().localDate().range(LocalDate.now().minusYears(20),LocalDate.now().minusYears(5)))
+                .generate(Select.field(Note::getCreatedAt), gen -> gen.temporal().localDateTime().range(LocalDateTime.now().minusYears(20),LocalDateTime.now().minusYears(5)))
                 .create();
         note.setClientGuid(client.getGuid());
         notesRepository.addNote(note);
-        logger.debug("note {} for client {} was added",note,client);
+        logger.info("note {} for client {} was added",note,client.getGuid());
 
     }
 
     private Client getRandomClient(){
-        int randomClientNumber = random.nextInt(clientRepository.getClientAmount());
+        int amount = clientRepository.getClientAmount();
+        if(amount<1){
+            logger.info("Have no clients for adding or updating notes");
+            throw new IllegalArgumentException();
+        }
+        int randomClientNumber = random.nextInt(amount);
         return clientRepository.getClientByIndex(randomClientNumber);
     }
 }

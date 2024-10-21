@@ -9,12 +9,10 @@ import java.util.List;
 
 @Component
 public class ClientRepository {
-    private List<Client> clients = new ArrayList<>();
+    private final List<Client> clients = new ArrayList<>();
 
     public List<Client> findAll(){
-        List<Client> copyList = new ArrayList<>(clients.size());
-        Collections.copy(copyList,clients);
-        return copyList;
+        return new ArrayList<>(clients);
     }
 
     public void add(Client client) {

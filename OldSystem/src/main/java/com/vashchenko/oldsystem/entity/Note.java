@@ -85,4 +85,17 @@ public class Note {
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
+
+    @Override
+    public String toString() {
+        return "Note{" +
+                "comments='" + comments + '\'' +
+                ", guid=" + guid +
+                ", modifiedAt=" + modifiedAt +
+                ", clientGuid=" + clientGuid +
+                ", datetime=" + datetime +
+                ", loggedUser='" + loggedUser + '\'' +
+                ", createdAt=" + createdAt +
+                '}';
+    }
 }

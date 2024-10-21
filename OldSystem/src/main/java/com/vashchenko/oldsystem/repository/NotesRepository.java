@@ -1,19 +1,17 @@
 package com.vashchenko.oldsystem.repository;
 
-import com.vashchenko.oldsystem.entity.Client;
 import com.vashchenko.oldsystem.entity.Note;
 import com.vashchenko.oldsystem.web.dto.GetNotesByClientRequest;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
 public class NotesRepository {
-    List<Note> notes = new ArrayList<>();
+    private final List<Note> notes = new ArrayList<>();
 
     public List<Note> findNotesByRequest(GetNotesByClientRequest request) {
         return notes.stream()
@@ -33,8 +31,6 @@ public class NotesRepository {
     }
 
     public List<Note> getAllNotes(){
-        List<Note> copyList = new ArrayList<>(notes.size());
-        Collections.copy(copyList,notes);
-        return notes;
+        return new ArrayList<>(notes);
     }
 }

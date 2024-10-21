@@ -82,4 +82,17 @@ public class Client {
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
+
+    @Override
+    public String toString() {
+        return "Client{" +
+                "guid=" + guid +
+                ", agency='" + agency + '\'' +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", status='" + status + '\'' +
+                ", dob=" + dob +
+                ", createdAt=" + createdAt +
+                '}';
+    }
 }
