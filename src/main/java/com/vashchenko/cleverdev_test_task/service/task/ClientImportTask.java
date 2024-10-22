@@ -13,7 +13,6 @@ import com.vashchenko.cleverdev_test_task.service.UserService;
 import com.vashchenko.cleverdev_test_task.statistics.ImportStatist;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -21,7 +20,7 @@ import java.util.List;
 @Component
 @Log4j2
 @RequiredArgsConstructor
-public class ImportTask{
+public class ClientImportTask {
     private final NotesDataFetcher notesFetcher;
     private final UserService userService;
     private final NoteService noteService;

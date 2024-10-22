@@ -3,7 +3,7 @@ package com.vashchenko.cleverdev_test_task.service;
 import com.vashchenko.cleverdev_test_task.exceptions.ClientProcessException;
 import com.vashchenko.cleverdev_test_task.fetchers.ClientDataFetcher;
 import com.vashchenko.cleverdev_test_task.fetchers.dto.response.ClientInfoResponseDto;
-import com.vashchenko.cleverdev_test_task.service.task.ImportTask;
+import com.vashchenko.cleverdev_test_task.service.task.ClientImportTask;
 import com.vashchenko.cleverdev_test_task.statistics.ImportStatist;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -21,7 +21,7 @@ import java.util.concurrent.Future;
 public class ImportService {
     private final ClientDataFetcher clientFetcher;
     private final ImportStatist statist;
-    private final ImportTask task;
+    private final ClientImportTask task;
     private final ExecutorService executorService;
 
     public void runImport() {
