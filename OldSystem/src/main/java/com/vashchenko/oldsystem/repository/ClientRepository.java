@@ -4,12 +4,11 @@ import com.vashchenko.oldsystem.entity.Client;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 @Component
 public class ClientRepository {
-    private final List<Client> clients = new ArrayList<>();
+    private final static List<Client> clients = new ArrayList<>();
 
     public List<Client> findAll(){
         return new ArrayList<>(clients);

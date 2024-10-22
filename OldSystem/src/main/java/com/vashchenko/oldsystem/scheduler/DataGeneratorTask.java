@@ -30,7 +30,7 @@ public class DataGeneratorTask {
         this.notesRepository = notesRepository;
     }
 
-    @Scheduled(fixedDelay = 5000)
+    @Scheduled(fixedDelay = 20000)
     public void generateData() {
         logger.info("Start generate task");
         int randomNumber = random.nextInt(3);
@@ -70,7 +70,9 @@ public class DataGeneratorTask {
         logger.info("createNewClient task started");
         Client client = Instancio.of(Client.class)
                 .set(Select.field(Client::getAgency), "Agency " + (int) (Math.random() * 6))
-                .set(Select.field(Client::getStatus), "ACTIVE") // Фиксированный статус
+                .set(Select.field(Client::getStatus), "ACTIVE")
+                .set(Select.field(Client::getFirstName), "FirstName " + (int) (Math.random() * 15))
+                .set(Select.field(Client::getLastName), "Lastname " + (int) (Math.random() * 15))
                 .generate(Select.field(Client::getDob), gen -> gen.temporal().localDate().range(LocalDate.now().minusYears(70),LocalDate.now().minusYears(5)))
                 .generate(Select.field(Client::getCreatedAt), gen -> gen.temporal().localDateTime().range(LocalDateTime.now().minusYears(21),LocalDateTime.now()))
                 .create();

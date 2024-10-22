@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 
 @Component
 public class NotesRepository {
-    private final List<Note> notes = new ArrayList<>();
+    private final static List<Note> notes = new ArrayList<>();
 
     public List<Note> findNotesByRequest(GetNotesByClientRequest request) {
         return notes.stream()
