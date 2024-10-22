@@ -21,7 +21,7 @@ import java.util.List;
 @Component
 @Log4j2
 @RequiredArgsConstructor
-public class ImportTask {
+public class ImportTask{
     private final NotesDataFetcher notesFetcher;
     private final UserService userService;
     private final NoteService noteService;
@@ -32,7 +32,6 @@ public class ImportTask {
 
     //Statistics block
     private final ImportStatist importStatist;
-    @Async("TaskExecutor")
     public void execute(ClientInfoResponseDto client ){
         long start = System.currentTimeMillis();
         log.info("Task '{}' start import",client.guid());
@@ -41,7 +40,7 @@ public class ImportTask {
         Patient patient = patientService.findByOldGuid(client.guid());
         if(patient!=null&& !isBlockedPatient(patient.getStatusId())){
             log.info("Patient guid:'{}' isSkipped:'{}'",client.guid(),false);
-
+            log.debug(notes +" for "+client);
             for (NoteInfoResponseDto note : notes) {
                 try {
                     importNote(note,patient,client);
@@ -86,7 +85,7 @@ public class ImportTask {
             importStatist.incrementSavedNotesCounter();
         }
         else {
-            log.info("Note with guid '{}' a later modification date as note with id '{}",noteDto.guid(),note.getId());
+            log.info("Note with guid '{}' has newest version as note with id '{}",noteDto.guid(),note.getId());
             importStatist.incrementSkippedNotesCounter();
         }
     }
