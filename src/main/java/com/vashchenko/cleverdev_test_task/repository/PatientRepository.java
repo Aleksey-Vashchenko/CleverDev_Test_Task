@@ -10,6 +10,6 @@ import java.util.Optional;
 
 @Repository
 public interface PatientRepository extends CrudRepository<Patient,Long> {
-    @Query("SELECT p FROM Patient p WHERE p.oldClientGuids LIKE %:oldClientGuid%")
-    Patient findByOldClientGuids(@Param("oldClientGuid") String oldClientGuid);
+    @Query("SELECT p FROM Patient p WHERE p.oldClientGuids LIKE CONCAT('%', :guid, '%')")
+    Patient findByOldClientGuids(@Param("guid") String oldClientGuid);
 }

@@ -32,38 +32,40 @@ public class ImportTask {
 
     //Statistics block
     private final ImportStatist importStatist;
-    @Async
+    @Async("TaskExecutor")
     public void execute(ClientInfoResponseDto client ){
         long start = System.currentTimeMillis();
-        log.debug("Task {} start import",client.guid());
+        log.info("Task '{}' start import",client.guid());
         List<NoteInfoResponseDto> notes = notesFetcher.getNotesByClient(client.agency(),client.guid());
         importStatist.incrementAllNotesCounter(notes.size());
         Patient patient = patientService.findByOldGuid(client.guid());
-        if(patient!=null&&isActivePatient(patient.getStatusId())){
+        if(patient!=null&& !isBlockedPatient(patient.getStatusId())){
+            log.info("Patient guid:'{}' isSkipped:'{}'",client.guid(),false);
+
             for (NoteInfoResponseDto note : notes) {
                 try {
                     importNote(note,patient,client);
                 }
                 catch (Exception e){
-                    log.error(String.format("Exception saving note with guid %s ",note.guid()),e);
+                    log.error("Exception saving note with guid '{}' ",note.guid(),e);
                 }
 
             }
         }
         else {
-            log.info(String.format("Patient with guid %s was not found in New System",client.guid()));
-            importStatist.incrementNotFoundClientsCounter();
+            log.info("Patient guid:'{}' isSkipped:'{}'",client.guid(),true);
+            importStatist.incrementSkippedClientsCounter();
             importStatist.incrementSkippedNotesCounter(notes.size());
         }
-        log.debug("Task %s end import with time {}",System.currentTimeMillis() - start);
+        log.info("Task '{}' end import with time '{}' ms",client.guid(),System.currentTimeMillis() - start);
     }
-    private void importNote(NoteInfoResponseDto noteDto, Patient patient,ClientInfoResponseDto clientDto) {
+    void importNote(NoteInfoResponseDto noteDto, Patient patient,ClientInfoResponseDto clientDto) {
         User user = findOrCreateUser(noteDto.loggedUser());
         Note note = noteService.findNoteByPatientGuidAndUserLoginAndCreatedDateTime(clientDto.guid(),user.getLogin(),noteDto.createdDateTime());
         updateOrCreateNote(note,noteDto,user,patient);
     }
 
-    private void updateOrCreateNote(Note note, NoteInfoResponseDto noteDto, User user, Patient patient) {
+    void updateOrCreateNote(Note note, NoteInfoResponseDto noteDto, User user, Patient patient) {
         if(note==null){
             processNotExistingNote(noteDto,user,patient);
         }
@@ -72,52 +74,52 @@ public class ImportTask {
         }
     }
 
-    private void processExistingNote(Note note,NoteInfoResponseDto noteDto){
-        log.debug(String.format("Note with guid '%s' was found in New System",noteDto.guid()));
+    void processExistingNote(Note note,NoteInfoResponseDto noteDto){
+        log.info("Note with guid '{}' was found in New System",noteDto.guid());
         if(note.getLastModifiedAt().isBefore(noteDto.modifiedDateTime())){
             note.setNote(noteDto.noteBody());
-            log.debug(String.format("There is no way to determine the last person who edited '%s' document. The default value is null.",noteDto.guid()));
+            log.info("There is no way to determine the last person who edited '{}' document. The default value is null.",noteDto.guid());
             note.setLastModifier(null);
             note.setLastModifiedAt(noteDto.modifiedDateTime());
             noteService.save(note);
-            log.info(String.format("Note with guid '%s' was successful updated in New System by Id '%s'",noteDto.guid(),note.getId()));
+            log.info("Note with guid '{}' was successful updated in New System by Id '{}'",noteDto.guid(),note.getId());
             importStatist.incrementSavedNotesCounter();
         }
         else {
-            log.debug(String.format("Note with guid '%s' a later modification date as note with id '%s",noteDto.guid(),note.getId()));
+            log.info("Note with guid '{}' a later modification date as note with id '{}",noteDto.guid(),note.getId());
             importStatist.incrementSkippedNotesCounter();
         }
     }
 
-    private void processNotExistingNote(NoteInfoResponseDto noteDto, User user,
+    void processNotExistingNote(NoteInfoResponseDto noteDto, User user,
                                         Patient patient){
-        log.debug(String.format("Note with guid '%s' was not found in New System",noteDto.guid()));
+        log.info("Note with guid '{}' was not found in New System",noteDto.guid());
         Note noteToSave = noteMapper.toEntity(noteDto);
         noteToSave.setCreator(user);
         noteToSave.setPatient(patient);
         if(noteToSave.getCreatedAt().isBefore(noteToSave.getLastModifiedAt())){
-            log.debug(String.format("There is no way to determine the last person who edited '%s' document. The default value is null.",noteToSave.getId()));
+            log.info("There is no way to determine the last person who edited '{}' document. The default value is null.",noteToSave.getId());
             noteToSave.setLastModifier(null);
         }
         else {
             noteToSave.setLastModifier(user);
         }
         noteService.save(noteToSave);
-        log.info(String.format("Note with guid '%s' was successful saved to New System by Id '%s'",noteDto.guid(),noteToSave.getId()));
+        log.info("Note with guid '{}' was successful saved to New System by Id '{}'",noteDto.guid(),noteToSave.getId());
         importStatist.incrementSavedNotesCounter();
     }
 
-    private boolean isActivePatient(short statusId) {
+    boolean isBlockedPatient(short statusId) {
         return statusId==200||statusId==210||statusId==230;
     }
 
-    private User findOrCreateUser(String login) {
+    User findOrCreateUser(String login) {
         User user = userService.findByLogin(login);
         if(user==null){
             User newUser = new User();
             newUser.setLogin(login);
             user = userService.save(newUser);
-            log.info(String.format("Was created user with login '%s' and id '%s'",login,user.getId()));
+            log.info("Was created user with login {}' and id '{}'",login,user.getId());
             importStatist.incrementCreatedUsersCounter();
         }
         return user;

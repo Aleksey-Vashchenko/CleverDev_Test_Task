@@ -20,12 +20,13 @@ public class ImportService {
 
     public void runImport() {
         log.debug("Start import");
+        statist.resetValues();
         List<ClientInfoResponseDto> clients = clientFetcher.getAllClients();
         statist.setAllClientsCounter(clients.size());
         for (ClientInfoResponseDto client : clients) {
             task.execute(client);
         }
-        log.debug("Import was completed");
+        log.info("Import was completed. Info about import "+statist);
     }
 
 

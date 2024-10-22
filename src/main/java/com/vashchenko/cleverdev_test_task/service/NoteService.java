@@ -13,7 +13,7 @@ import java.util.UUID;
 public class NoteService {
     private final NoteRepository repository;
     public Note findNoteByPatientGuidAndUserLoginAndCreatedDateTime(UUID guid, String login, LocalDateTime dob) {
-        return repository.findNoteByPatientGuidAndUserLoginAndCreatedDateTime(guid,login,dob);
+        return repository.findNoteByPatientGuidAndUserLoginAndCreatedDateTime(guid.toString(),login,dob);
     }
 
     public Note save(Note note) {
