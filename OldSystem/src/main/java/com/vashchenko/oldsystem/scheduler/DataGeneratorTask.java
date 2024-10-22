@@ -100,7 +100,7 @@ public class DataGeneratorTask {
                 .create();
         note.setClientGuid(client.getGuid());
         notesRepository.addNote(note);
-        logger.info("note {} for client {} was added",note,client.getGuid());
+        logger.info("note {} was added",note);
 
     }
 
