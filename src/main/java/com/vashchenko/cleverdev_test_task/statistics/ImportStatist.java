@@ -42,7 +42,7 @@ public class ImportStatist {
         return "ImportStatist{" +
                 "savedNotesCounter=" + savedNotesCounter +
                 ", savedUsersCounter=" + savedUsersCounter +
-                ", notFoundClientsCounter=" + skippedClientsCounter +
+                ", skippedClientsCounter=" + skippedClientsCounter +
                 ", skippedNotesCounter=" + skippedNotesCounter +
                 ", allClientsCounter=" + allClientsCounter +
                 ", allNotesCounter=" + allNotesCounter +

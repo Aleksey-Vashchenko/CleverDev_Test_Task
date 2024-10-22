@@ -29,6 +29,7 @@ public class ClientDataFetcher {
             ClientInfoResponseDto[] clients = restTemplate.postForObject(usersUrl,null, ClientInfoResponseDto[].class);
             if(clients==null) clients = new ClientInfoResponseDto[0];
             log.info(String.format("%s clients were fetched from Old System",clients.length));
+            log.debug(Arrays.toString(clients));
             return Arrays.asList(clients);
         }
         catch (RestClientException e){
