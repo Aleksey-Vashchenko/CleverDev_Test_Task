@@ -57,13 +57,13 @@ public class ClientImportTask {
         }
         log.info("Task '{}' end import with time '{}' ms",client.guid(),System.currentTimeMillis() - start);
     }
-    void importNote(NoteInfoResponseDto noteDto, Patient patient,ClientInfoResponseDto clientDto) {
+    private void importNote(NoteInfoResponseDto noteDto, Patient patient,ClientInfoResponseDto clientDto) {
         User user = findOrCreateUser(noteDto.loggedUser());
         Note note = noteService.findNoteByPatientGuidAndUserLoginAndCreatedDateTime(clientDto.guid(),user.getLogin(),noteDto.createdDateTime());
         updateOrCreateNote(note,noteDto,user,patient);
     }
 
-    void updateOrCreateNote(Note note, NoteInfoResponseDto noteDto, User user, Patient patient) {
+    private void updateOrCreateNote(Note note, NoteInfoResponseDto noteDto, User user, Patient patient) {
         if(note==null){
             processNotExistingNote(noteDto,user,patient);
         }
@@ -72,7 +72,7 @@ public class ClientImportTask {
         }
     }
 
-    void processExistingNote(Note note,NoteInfoResponseDto noteDto){
+    private void processExistingNote(Note note,NoteInfoResponseDto noteDto){
         log.info("Note with guid '{}' was found in New System",noteDto.guid());
         if(note.getLastModifiedAt().isBefore(noteDto.modifiedDateTime())){
             note.setNote(noteDto.noteBody());
@@ -89,7 +89,7 @@ public class ClientImportTask {
         }
     }
 
-    void processNotExistingNote(NoteInfoResponseDto noteDto, User user,
+    private void processNotExistingNote(NoteInfoResponseDto noteDto, User user,
                                         Patient patient){
         log.info("Note with guid '{}' was not found in New System",noteDto.guid());
         Note noteToSave = noteMapper.toEntity(noteDto);
@@ -107,11 +107,11 @@ public class ClientImportTask {
         importStatist.incrementSavedNotesCounter();
     }
 
-    boolean isBlockedPatient(short statusId) {
+    private boolean isBlockedPatient(short statusId) {
         return statusId==200||statusId==210||statusId==230;
     }
 
-    User findOrCreateUser(String login) {
+    private User findOrCreateUser(String login) {
         User user = userService.findByLogin(login);
         if(user==null){
             User newUser = new User();
